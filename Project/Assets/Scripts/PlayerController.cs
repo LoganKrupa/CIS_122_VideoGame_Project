@@ -9,9 +9,9 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private Collider2D collider;
 
-    [SerializeField] private LayerMask Ground;
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private float jumpForce = 10f;
+    public LayerMask Ground;
+    public float speed = 5f;
+    public float jumpForce = 10f;
     //calling Animations
     private enum State { idle, run, jump, falling, crouch, climb, hurt }
     private State state = State.idle;
