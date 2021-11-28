@@ -9,14 +9,38 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private Collider2D collider;
 
-    [SerializeField] private LayerMask Ground;
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private float jumpForce = 10f;
+    //Feet
+    private bool isGround;
+    public Transform Feet;
+    public float checkRadius;
 
+    //Frount
+    public Transform Frount;
+    public bool isFrount;
+    public bool WallSliding;
+    public float wallSlidingSpeed;
+
+    //jump
+    public LayerMask Ground;
+    public float speed = 5f;
+    public float jumpForce = 10f;
+
+    //wallJumping
+    bool wallJumping;
+    public float xWallForce;
+    public float yWallForce;
+    public float walljumpTime;
+
+    //colectibles
     public int Cherryies = 0;
+
     //calling Animations
     private enum State { idle, run, jump, falling, crouch, climb, hurt }
     private State state = State.idle;
+
+    //Calling Chest Animations
+    private enum State1 { closed, open}
+    private State1 state1 = State1.closed;
 
     
 
@@ -41,8 +65,8 @@ public class PlayerController : MonoBehaviour
         float hDirection = Input.GetAxis("Horizontal");
         //float vDirection = Input.GetAxis("Jump");
 
-
-        if (hDirection > 0)
+        //Movement Controller
+        if (hDirection > 0 )
         {
 
             rb.velocity = new Vector2(speed, rb.velocity.y);
@@ -57,12 +81,59 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector2(-1, 1);
         }
 
-        if (Input.GetButtonDown("Jump") && collider.IsTouchingLayers(Ground))
+        //Jumping control
+        isGround = Physics2D.OverlapCircle(Feet.position, checkRadius, Ground);
+
+        if (Input.GetButtonDown("Jump") && isGround == true /*collider.IsTouchingLayers(isGround)*/)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             state = State.jump;
 
         }
+
+        //wall jump derection
+        
+
+        //sliding down wall
+
+        isFrount = Physics2D.OverlapCircle(Frount.position, checkRadius, Ground);
+
+        if(isFrount == true && isGround == false && hDirection != 0)
+        {
+            WallSliding = true;
+        }
+        else
+        {
+            WallSliding = false;
+        }
+
+        if (WallSliding)
+        {
+            
+
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue) );
+        }
+
+        if (Input.GetButtonDown("Jump") && WallSliding == true)
+        {
+
+            //rb.velocity = new Vector2(xWallForce * -hDirection, jumpForce);
+            //state = State.jump;
+            
+            wallJumping = true;
+            Invoke("SetWallJumpingToFalse", walljumpTime);
+
+        }
+        if(wallJumping == true)
+        {
+            rb.velocity = new Vector2(xWallForce * -hDirection, yWallForce);
+            state = State.jump;
+            // rb.velocity = new Vector2(xWallForce * , yWallForce);
+            
+        }
+        
+
+
 
         //Methods
         VelocityState();
@@ -70,6 +141,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    void SetWallJumpingToFalse()
+    {
+        wallJumping = false;
+    }
+
+    //Collectibles cherry
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "Collectible")
@@ -77,9 +154,19 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
             Cherryies += 1;
         }
+
+        if(collision.tag == "Chest")
+        {
+            
+            
+        }
     }
 
+    //Chest
 
+    
+
+    //Animation controller
     private void VelocityState()
     {
         if (state == State.jump)
