@@ -9,6 +9,9 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private Collider2D collider;
 
+    //Health
+    public float Health;
+
     //Feet
     private bool isGround;
     public Transform Feet;
@@ -35,7 +38,7 @@ public class PlayerController : MonoBehaviour
     public int Cherryies = 0;
 
     //calling Animations
-    private enum State { idle, run, jump, falling, crouch, climb, hurt }
+    private enum State { idle, run, jump, falling, crouch, climb, hurt, Collection }
     private State state = State.idle;
 
     //Calling Chest Animations
@@ -71,7 +74,7 @@ public class PlayerController : MonoBehaviour
 
             rb.velocity = new Vector2(speed, rb.velocity.y);
             transform.localScale = new Vector2(1, 1);
-
+            
 
         }
 
@@ -79,6 +82,12 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector2(-speed, rb.velocity.y);
             transform.localScale = new Vector2(-1, 1);
+        }
+
+        else
+        {
+            rb.velocity = new Vector2(0, rb.velocity.y);
+            //transform.localScale = new Vector2(1, 1);
         }
 
         //Jumping control
@@ -92,8 +101,6 @@ public class PlayerController : MonoBehaviour
         }
 
         //wall jump derection
-        
-
         //sliding down wall
 
         isFrount = Physics2D.OverlapCircle(Frount.position, checkRadius, Ground);
@@ -131,12 +138,12 @@ public class PlayerController : MonoBehaviour
             // rb.velocity = new Vector2(xWallForce * , yWallForce);
             
         }
-        
+
+    
 
 
-
-        //Methods
-        VelocityState();
+    //Methods
+    VelocityState();
         anim.SetInteger("State", (int)state);
 
     }
@@ -146,13 +153,26 @@ public class PlayerController : MonoBehaviour
         wallJumping = false;
     }
 
+
     //Collectibles cherry
+
+    //public Animator Collection;
+    //public AnimationClip Item_CollectionClip;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.tag == "Collectible")
         {
-            Destroy(collision.gameObject);
+            
+            state = State.Collection;
+            
             Cherryies += 1;
+
+            if(state == State.Collection)
+            {
+                //Collection.Play("Item_Collection");
+                Destroy(collision.gameObject/*, Item_CollectionClip.length*/);
+            }
         }
 
         if(collision.tag == "Chest")
@@ -162,9 +182,20 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //Chest
+    //Falling on enemy control
 
-    
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Enemy" && state == State.falling)
+        {
+            Destroy(collision.gameObject);
+            
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            state = State.jump;
+        }
+    }
+
+
 
     //Animation controller
     private void VelocityState()
