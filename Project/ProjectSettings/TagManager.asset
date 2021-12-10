@@ -7,6 +7,11 @@ TagManager:
   - Collectible
   - Chest
   - Enemy
+  - DeathZone
+  - Coin
+  - Cherry
+  - Projectile
+  - Ground
   layers:
   - Default
   - TransparentFX
