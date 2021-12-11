@@ -5,7 +5,7 @@ using UnityEngine;
 public class AttackCoin : MonoBehaviour
 {
 
-
+    public GameObject DeathAnimation;
     public float launchForce;
     public float speed = 20f;
 
@@ -16,6 +16,7 @@ public class AttackCoin : MonoBehaviour
     {
         rb.velocity = transform.right * speed;
         rb.velocity = new Vector2(rb.velocity.x, launchForce);
+        ChageDirection();
     }
 
     // Update is called once per frame
@@ -29,19 +30,48 @@ public class AttackCoin : MonoBehaviour
 
         if(collision.tag == "Enemy")
         {
+            
             Destroy(collision.gameObject);
-        }
-        /*else if(collision.tag == "Ground")
-        {
-            Destroy(gameObject);
-        }*/
-        void OnBecameInvisible()
-        {
-            enabled = false;
+            Instantiate(DeathAnimation, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
+        else if(collision.tag == "Ground")
+        {
+            Destroy(gameObject);
+        }
+        else { }
         //Destroy(gameObject);
 
     }
+
+
+    /*public void OnBecameInvisible()
+    {
+        //enabled = false;
+        Destroy(gameObject);
+    }*/
+
+    public void ChageDirection()
+    {
+        float hDirection = Input.GetAxis("Horizontal");
+        //float vDirection = Input.GetAxis("Jump");
+
+        //Movement Controller
+        if (hDirection > 0)
+        {
+
+            rb.velocity = new Vector2(speed, rb.velocity.y);
+            transform.localScale = new Vector2(1, 1);
+
+
+        }
+
+        else if (hDirection < 0)
+        {
+            rb.velocity = new Vector2(-speed, rb.velocity.y);
+            transform.localScale = new Vector2(-1, 1);
+        }
+    }
+
 
 }

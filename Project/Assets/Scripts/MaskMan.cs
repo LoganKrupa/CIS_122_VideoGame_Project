@@ -16,6 +16,14 @@ public class MaskMan : MonoBehaviour
     private Rigidbody2D rb;
     private Animator anim;
 
+    //movement control varebles
+    private bool isGround;
+    public Transform Feet;
+    public Transform Head;
+    public bool isHead;
+    public float checkRadius;
+    public GameObject DeathAnimation;
+
     //Animation states
     private enum State { idle, run, jump, falling, hurt }
     private State state = State.idle;
@@ -47,7 +55,11 @@ public class MaskMan : MonoBehaviour
                 {
                     transform.localScale = new Vector3(1, 1, 1);
                 }
-                if (coll.IsTouchingLayers(Ground))
+
+                //feet have to touch the ground to jump
+                isGround = Physics2D.OverlapCircle(Feet.position, checkRadius, Ground);
+
+                if (isGround == true)
                 {
                     rb.velocity = new Vector2(-jumpLength, jumpHeight);
                     state = State.jump;
@@ -75,7 +87,9 @@ public class MaskMan : MonoBehaviour
                 {
                     transform.localScale = new Vector3(-1, 1, 1);
                 }
-                if (coll.IsTouchingLayers(Ground))
+                isGround = Physics2D.OverlapCircle(Feet.position, checkRadius, Ground);
+
+                if (isGround == true)
                 {
                     rb.velocity = new Vector2(jumpLength, jumpHeight);
                     state = State.jump;
@@ -105,13 +119,26 @@ public class MaskMan : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         
-
-        if (collision.gameObject.tag == "player" )
+        if (collision.gameObject.tag == "Player" )
         {
+            
 
-            state = State.hurt;
+            
 
+            /*state = State.hurt;
+            if(state == State.hurt)
+            {
+                //Destroy(gameObject);
+                Instantiate(DeathAnimation, transform.position, Quaternion.identity);
+            }*/
         }
+
+        if(collision.gameObject.tag == "Projectile")
+        {
+            
+            Destroy(gameObject);
+        }
+
     }
 
 
@@ -119,15 +146,15 @@ public class MaskMan : MonoBehaviour
     {
         if(gameObject == null)
         {
+            //Instantiate(DeathAnimation, transform.position, Quaternion.identity);
 
-            state = State.hurt;
         }
 
     }
 
     private void OnDestroy()
     {
-        state = State.hurt;
+        Instantiate(DeathAnimation, transform.position, Quaternion.identity);
     }
 
 

@@ -12,6 +12,7 @@ TagManager:
   - Cherry
   - Projectile
   - Ground
+  - EnemyHead
   layers:
   - Default
   - TransparentFX

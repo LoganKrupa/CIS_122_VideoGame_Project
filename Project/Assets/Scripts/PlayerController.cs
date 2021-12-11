@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
 
     //Hurt
     public float hurtBounce = 10f;
+    public GameObject PlayerDeathAnimation;
 
     //Feet
     private bool isGround;
@@ -40,6 +41,7 @@ public class PlayerController : MonoBehaviour
     //colectibles
     public int Cherryies = 0;
     public int Coins = 0;
+    public GameObject CollectionAnimation;
 
     //calling Animations
     private enum State { idle, run, jump, falling, crouch, climb, hurt, Collection, death }
@@ -79,12 +81,16 @@ public class PlayerController : MonoBehaviour
 
         }
         
-        else { }
+        if(state == State.hurt)
+        {
+            HurtControler();
+        }
 
 
 
 
         //Methods
+        //HurtControler();
         PlayerDeath();
         VelocityState();
         anim.SetInteger("State", (int)state);
@@ -96,7 +102,7 @@ public class PlayerController : MonoBehaviour
 
     public void PlayerDeath()
     {
-        if (Health < 0)
+        if (Health <= 0)
         {
             state = State.death;
 
@@ -104,9 +110,29 @@ public class PlayerController : MonoBehaviour
 
         if (state == State.death)
         {
+            
+            Instantiate(PlayerDeathAnimation, transform.position, Quaternion.identity);
+            Destroy(gameObject);
 
+            /*float time = 5;
+
+            while(time > 0)
+            {
+                time -= Time.deltaTime;
+            }
+            
+            if(time == 0)
+            {
+                
+            }*/
+
+            Application.LoadLevel(Application.loadedLevel);
+
+            //LevelManager.Instance.Respwn();
         }
     }
+
+    
 
     //Collectibles cherry
 
@@ -126,6 +152,7 @@ public class PlayerController : MonoBehaviour
             if(state == State.Collection)
             {
                 //Collection.Play("Item_Collection");
+                Instantiate(CollectionAnimation, transform.position, Quaternion.identity);
                 Destroy(collision.gameObject/*, Item_CollectionClip.length*/);
             }
         }
@@ -164,6 +191,9 @@ public class PlayerController : MonoBehaviour
             
             if (state == State.falling)
             {
+                //Destroy(other.gameObject);
+                //Instantiate(DeathAnimation, transform.position, Quaternion.identity);
+
                 Destroy(other.gameObject);
 
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -171,29 +201,61 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                
+                float hDirection = Input.GetAxis("Horizontal");
                 state = State.hurt;
-                Health = Health - 1;
-                
-                /*if (other.gameObject.transform.position.x > transform.position.x)
-                {
-                    //enemy is to the right
-                    rb.velocity = new Vector2(-hurtBounce, rb.velocity.y);
-                }
-                else
-                {
-                    //enemy is to the left
-                    rb.velocity = new Vector2(hurtBounce, rb.velocity.y);
-                }*/
+                rb.velocity = new Vector2(hurtBounce * hDirection, jumpForce / 2);
 
             }
         }
-        else { }
+        
+
     }
 
     //Player Death controler
     
+    public void HurtControler()
+    {
+        float hDirection = Input.GetAxis("Horizontal");
+        if (state == State.hurt)
+        {
+            //state = State.hurt;
+            Health = Health - 1;
 
+            rb.velocity = new Vector2(hurtBounce * hDirection, jumpForce/2);
+
+            isGround = Physics2D.OverlapCircle(Feet.position, checkRadius, Ground);
+
+            //ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+            if (isGround == true)
+            {
+                state = State.idle;
+            }
+
+            /*if (transform.position.x > transform.position.x)
+            {
+                //enemy is to the right
+                rb.velocity = new Vector2(-hurtBounce, rb.velocity.y);
+            }
+            else
+            {
+                //enemy is to the left
+                rb.velocity = new Vector2(hurtBounce, rb.velocity.y);
+            }*/
+        }
+        
+
+
+        else if (Mathf.Abs(rb.velocity.x) > 2f)
+        {
+            state = State.run;
+        }
+
+        else
+        {
+            state = State.idle;
+        }
+
+    }
 
     //Animation controller
     private void VelocityState()
@@ -207,7 +269,9 @@ public class PlayerController : MonoBehaviour
         }
         else if (state == State.falling)
         {
-            if (collider.IsTouchingLayers(Ground))
+            isGround = Physics2D.OverlapCircle(Feet.position, checkRadius, Ground);
+
+            if (isGround == true)
             {
                 state = State.idle;
             }

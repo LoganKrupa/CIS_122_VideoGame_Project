@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
-    public GameObject coin;
-    public float launchForce;
-    public float launchSpeed;
+    //public GameObject coin;
+    //public float launchForce;
+    //public float launchSpeed;
     public Transform throwPoint;
     public GameObject coinPrefab;
     
@@ -33,6 +33,7 @@ public class Attack : MonoBehaviour
 
     public void Throw()
     {
+
         Instantiate(coinPrefab, throwPoint.position, throwPoint.rotation);
 
     }
