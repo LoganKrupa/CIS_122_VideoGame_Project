@@ -86,7 +86,10 @@ public class PlayerController : MonoBehaviour
             HurtControler();
         }
 
-
+        if (state == State.run && isGround == false)
+        {
+            state = State.falling;
+        }
 
 
         //Methods
@@ -136,9 +139,6 @@ public class PlayerController : MonoBehaviour
 
     //Collectibles cherry
 
-    //public Animator Collection;
-    //public AnimationClip Item_CollectionClip;
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         //cherry cconlection
@@ -151,9 +151,10 @@ public class PlayerController : MonoBehaviour
 
             if(state == State.Collection)
             {
-                //Collection.Play("Item_Collection");
+                state = State.falling;
                 Instantiate(CollectionAnimation, transform.position, Quaternion.identity);
-                Destroy(collision.gameObject/*, Item_CollectionClip.length*/);
+                Destroy(collision.gameObject);
+                
             }
         }
 
@@ -167,8 +168,9 @@ public class PlayerController : MonoBehaviour
 
             if (state == State.Collection)
             {
-                //Collection.Play("Item_Collection");
-                Destroy(collision.gameObject/*, Item_CollectionClip.length*/);
+                
+                Destroy(collision.gameObject);
+                state = State.falling;
             }
         }
 
@@ -369,6 +371,8 @@ public class PlayerController : MonoBehaviour
             // rb.velocity = new Vector2(xWallForce * , yWallForce);
 
         }
+
+       
 
     }
 
