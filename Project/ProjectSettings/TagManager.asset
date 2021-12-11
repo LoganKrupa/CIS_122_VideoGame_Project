@@ -3,7 +3,16 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Collectible
+  - Chest
+  - Enemy
+  - DeathZone
+  - Coin
+  - Cherry
+  - Projectile
+  - Ground
+  - EnemyHead
   layers:
   - Default
   - TransparentFX
@@ -40,6 +49,9 @@ TagManager:
   m_SortingLayers:
   - name: BackGroud
     uniqueID: 97308083
+    locked: 0
+  - name: BackGroundObjects
+    uniqueID: 3584934955
     locked: 0
   - name: Default
     uniqueID: 0
